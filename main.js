@@ -1,5 +1,3 @@
-const { createElement } = require("react");
-
 const books = [];
 const RENDER_EVENT = "render-book";
 
@@ -8,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   submitForm.addEventListener("click", function (event) {
     event.preventDefault();
     addBooks();
-    console.log("submit button clicked");
   });
 });
 
@@ -41,7 +38,6 @@ function generatedBookForm(generatedBookID, bookTitle, bookAuthor, bookYear, isC
 
 document.addEventListener(RENDER_EVENT, function () {
   console.log(books);
-  console.log("testing");
 
   const uncompleteBooks = document.getElementById("incompleteBookList");
   uncompleteBooks.innerHTML = "";
@@ -49,10 +45,7 @@ document.addEventListener(RENDER_EVENT, function () {
   for (const booksItem of books) {
     const bookElement = createNewBookList(booksItem);
     uncompleteBooks.append(bookElement);
-    console.log("testing bookItems", booksItem);
   }
-
-  console.log(uncompleteBooks);
 });
 
 function createNewBookList(bookValue) {
@@ -65,31 +58,53 @@ function createNewBookList(bookValue) {
   const bookYear = document.createElement("p");
   bookYear.innerText = bookValue.year;
 
-  const textContainer = document.createElement("form");
+  const buttonDelete = document.createElement("button");
+  buttonDelete.innerText = "hapus buku";
+  buttonDelete.addEventListener("click", function (e) {
+    e.preventDefault();
+    deleteBook(bookValue.id);
+    console.log("button delete clicked");
+  });
+
+  const buttonEdit = document.createElement("button");
+  buttonEdit.innerText = "edit buku";
+  buttonEdit.addEventListener("click", function (e) {
+    e.preventDefault();
+    editBook(bookValue.id);
+    console.log("button edit clicked");
+  });
+
+  const textContainer = document.createElement("div");
   textContainer.classList.add("inner");
-  textContainer.append(bookTitle, bookAuthor, bookYear);
+  textContainer.append(bookTitle, bookAuthor, bookYear, buttonDelete, buttonEdit);
 
   const container = document.createElement("section");
   container.classList.add("item", "shadow");
   container.append(textContainer);
   container.setAttribute("id", `books-${bookValue.id}`);
 
-  const buttonComplete = document.createElement("button");
-  buttonComplete.addEventListener("click", function () {
-    console.log("button complete clicked");
-  });
+  if (bookValue.completed) {
+    const buttonComplete = document.createElement("button");
+    buttonComplete.innerText = "selesai dibaca";
+    buttonComplete.addEventListener("click", function (e) {
+      e.preventDefault();
+      completedBooks(bookValue.id);
+      console.log("button complete clicked");
+    });
 
-  const buttonDelete = document.createElement("button");
-  buttonDelete.addEventListener("click", function () {
-    console.log("button complete clicked");
-  });
+    container.append(buttonComplete);
+  } else {
+    const buttoninComplete = document.createElement("button");
+    buttoninComplete.innerText = "belum selesai dibaca";
+    buttoninComplete.addEventListener("click", function (e) {
+      e.preventDefault();
+      inCompletedBooks(bookValue.id);
+      console.log("button complete clicked");
+    });
 
-  const buttonEdit = document.createElement("button");
-  buttonEdit.addEventListener("click", function () {
-    console.log("button complete clicked");
-  });
+    container.append(buttoninComplete);
+  }
 
-  console.log("this is bookValue", bookValue);
   return container;
 }
 
