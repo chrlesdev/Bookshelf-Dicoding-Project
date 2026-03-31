@@ -1,3 +1,5 @@
+const { createElement } = require("react");
+
 const books = [];
 const RENDER_EVENT = "render-book";
 
@@ -13,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function addBooks() {
   const bookTitle = document.getElementById("bookFormTitle").value;
   const bookAuthor = document.getElementById("bookFormAuthor").value;
-  const bookYear = document.getElementById("bookFormYear");
+  const bookYear = document.getElementById("bookFormYear").value;
   const isCompleted = document.getElementById("bookFormIsComplete").checked;
 
   const generatedBookID = generatedBookId();
@@ -24,7 +26,7 @@ function addBooks() {
 }
 
 function generatedBookId() {
-  return new Date();
+  return +new Date();
 }
 
 function generatedBookForm(generatedBookID, bookTitle, bookAuthor, bookYear, isCompleted) {
@@ -39,12 +41,18 @@ function generatedBookForm(generatedBookID, bookTitle, bookAuthor, bookYear, isC
 
 document.addEventListener(RENDER_EVENT, function () {
   console.log(books);
-  const uncompleteBooks = document.getElementById("books");
+  console.log("testing");
+
+  const uncompleteBooks = document.getElementById("incompleteBookList");
   uncompleteBooks.innerHTML = "";
+
   for (const booksItem of books) {
     const bookElement = createNewBookList(booksItem);
     uncompleteBooks.append(bookElement);
+    console.log("testing bookItems", booksItem);
   }
+
+  console.log(uncompleteBooks);
 });
 
 function createNewBookList(bookValue) {
@@ -57,14 +65,32 @@ function createNewBookList(bookValue) {
   const bookYear = document.createElement("p");
   bookYear.innerText = bookValue.year;
 
-  const textContainer = document.createElement("div");
+  const textContainer = document.createElement("form");
   textContainer.classList.add("inner");
   textContainer.append(bookTitle, bookAuthor, bookYear);
 
-  const container = document.createElement("div");
+  const container = document.createElement("section");
   container.classList.add("item", "shadow");
   container.append(textContainer);
   container.setAttribute("id", `books-${bookValue.id}`);
+
+  const buttonComplete = document.createElement("button");
+  buttonComplete.addEventListener("click", function () {
+    console.log("button complete clicked");
+  });
+
+  const buttonDelete = document.createElement("button");
+  buttonDelete.addEventListener("click", function () {
+    console.log("button complete clicked");
+  });
+
+  const buttonEdit = document.createElement("button");
+  buttonEdit.addEventListener("click", function () {
+    console.log("button complete clicked");
+  });
+
+  console.log("this is bookValue", bookValue);
+  return container;
 }
 
 console.log("Hello, world!");
