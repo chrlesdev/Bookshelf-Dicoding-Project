@@ -3,11 +3,14 @@ const RENDER_EVENT = "render-book";
 const localStorageKey = "BooksAreQuietMiracles";
 let searchKeyword = "";
 
-if (typeof Storage !== undefined) {
-  if (localStorage.getItem(localStorageKey) === null) localStorage.getItem(localStorageKey, 0);
+if (typeof Storage !== "undefined") {
+  if (localStorage.getItem(localStorageKey) === null) {
+    localStorage.setItem(localStorageKey, JSON.stringify([]));
+  }
 }
 document.addEventListener("DOMContentLoaded", function () {
   const submitForm = document.getElementById("bookFormSubmit");
+  const search = document.getElementById("searchBookTitle");
 
   const parsedData = localStorage.getItem(localStorageKey);
 
@@ -23,6 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const datas = JSON.stringify(books);
     localStorage.setItem(localStorageKey, datas);
   });
+
+  if (search) {
+    search.addEventListener("keyup", function (e) {
+      searchKeyword = e.target.value.toLowerCase();
+      document.dispatchEvent(new Event(RENDER_EVENT));
+    });
+  }
 });
 
 function addBooks() {
@@ -78,9 +88,13 @@ document.addEventListener(RENDER_EVENT, function () {
 });
 
 function createNewBookList(bookValue) {
+  const container = document.createElement("div");
+  container.setAttribute("data-testid", "bookItem");
+  container.setAttribute("data-bookid", bookValue.id);
+  container.setAttribute("id", `books-${bookValue.id}`);
+
   const bookTitle = document.createElement("h3");
   bookTitle.setAttribute("data-testid", "bookItemTitle");
-  bookTitle.classList.add("book-title");
   bookTitle.innerText = bookValue.title;
 
   const bookAuthor = document.createElement("p");
@@ -91,8 +105,10 @@ function createNewBookList(bookValue) {
   bookYear.setAttribute("data-testid", "bookItemYear");
   bookYear.innerText = `Tahun: ${bookValue.year}`;
 
+  const buttonContainer = document.createElement("div");
+
   const buttonDelete = document.createElement("button");
-  buttonDelete.innerText = "hapus buku";
+  buttonDelete.innerText = "Hapus Buku";
   buttonDelete.setAttribute("data-testid", "bookItemDeleteButton");
   buttonDelete.addEventListener("click", function (e) {
     e.preventDefault();
@@ -100,45 +116,32 @@ function createNewBookList(bookValue) {
   });
 
   const buttonEdit = document.createElement("button");
-  buttonEdit.innerText = "edit buku";
+  buttonEdit.innerText = "Edit Buku";
   buttonEdit.setAttribute("data-testid", "bookItemEditButton");
   buttonEdit.addEventListener("click", function (e) {
     e.preventDefault();
     editBook(bookValue.id);
   });
 
-  const textContainer = document.createElement("div");
-  textContainer.classList.add("inner");
-  textContainer.append(bookTitle, bookAuthor, bookYear, buttonDelete, buttonEdit);
-
-  const container = document.createElement("section");
-  container.setAttribute("data-bookid", bookValue.id);
-  container.setAttribute("data-testid", "bookItem");
-  container.append(textContainer);
-  container.setAttribute("id", `books-${bookValue.id}`);
+  const toggleButton = document.createElement("button");
+  toggleButton.setAttribute("data-testid", "bookItemIsCompleteButton");
 
   if (bookValue.completed) {
-    const buttonComplete = document.createElement("button");
-    buttonComplete.innerText = "selesai dibaca";
-    buttonComplete.setAttribute("data-testid", "bookItemIsCompleteButton");
-    buttonComplete.addEventListener("click", function (e) {
+    toggleButton.innerText = "belum selesai dibaca";
+    toggleButton.addEventListener("click", function (e) {
       e.preventDefault();
       inCompletedBooks(bookValue.id);
     });
-
-    container.append(buttonComplete);
   } else {
-    const buttoninComplete = document.createElement("button");
-    buttoninComplete.innerText = "belum selesai dibaca";
-    buttoninComplete.setAttribute("data-testid", "bookItemIsCompleteButton");
-    buttoninComplete.addEventListener("click", function (e) {
+    toggleButton.innerText = "selesai dibaca";
+    toggleButton.addEventListener("click", function (e) {
       e.preventDefault();
       completedBooks(bookValue.id);
     });
-
-    container.append(buttoninComplete);
   }
 
+  buttonContainer.append(toggleButton, buttonDelete, buttonEdit);
+  container.append(bookTitle, bookAuthor, bookYear, buttonContainer);
   return container;
 }
 
@@ -197,11 +200,3 @@ function findBookIndex(bookId) {
   return -1;
 }
 
-const search = document.getElementById("searchBookTitle");
-
-search.addEventListener("keyup", function (e) {
-  searchKeyword = e.target.value.toLowerCase();
-  document.dispatchEvent(new Event(RENDER_EVENT));
-});
-
-//design tak perlu, system jalan nomor 1 🙏
