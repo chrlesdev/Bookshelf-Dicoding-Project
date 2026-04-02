@@ -39,10 +39,10 @@ function addBooks() {
   const bookTitle = document.getElementById("bookFormTitle").value;
   const bookAuthor = document.getElementById("bookFormAuthor").value;
   const bookYear = document.getElementById("bookFormYear").value;
-  const isCompleted = document.getElementById("bookFormIsComplete").checked;
+  const isComplete = document.getElementById("bookFormIsComplete").checked;
 
   const generatedBookID = generatedBookId();
-  const booksObject = generatedBookForm(generatedBookID, bookTitle, bookAuthor, Number(bookYear), isCompleted);
+  const booksObject = generatedBookForm(generatedBookID, bookTitle, bookAuthor, Number(bookYear), isComplete);
 
   //cek dlu input gak boleh kosong
   if (!bookTitle.trim() || !bookAuthor.trim() || !bookYear) {
@@ -57,13 +57,13 @@ function generatedBookId() {
   return +new Date();
 }
 
-function generatedBookForm(generatedBookID, bookTitle, bookAuthor, bookYear, isCompleted) {
+function generatedBookForm(generatedBookID, bookTitle, bookAuthor, bookYear, isComplete) {
   return {
     id: generatedBookID,
     title: bookTitle,
     author: bookAuthor,
     year: bookYear,
-    completed: isCompleted,
+    isComplete,
   };
 }
 
@@ -78,7 +78,7 @@ document.addEventListener(RENDER_EVENT, function () {
     const isMatched = booksItem.title.toLowerCase().includes(searchKeyword);
     if (isMatched) {
       const bookElement = createNewBookList(booksItem);
-      if (booksItem.completed === false) {
+      if (booksItem.isComplete === false) {
         uncompleteBooks.append(bookElement);
       } else {
         completedBooks.append(bookElement);
@@ -126,7 +126,7 @@ function createNewBookList(bookValue) {
   const toggleButton = document.createElement("button");
   toggleButton.setAttribute("data-testid", "bookItemIsCompleteButton");
 
-  if (bookValue.completed) {
+  if (bookValue.isComplete) {
     toggleButton.innerText = "belum selesai dibaca";
     toggleButton.addEventListener("click", function (e) {
       e.preventDefault();
@@ -150,7 +150,7 @@ function completedBooks(bookId) {
 
   if (bookTarget === null) return;
 
-  bookTarget.completed = true;
+  bookTarget.isComplete = true;
   localStorage.setItem(localStorageKey, JSON.stringify(books));
 
   document.dispatchEvent(new Event(RENDER_EVENT));
@@ -168,7 +168,7 @@ function inCompletedBooks(bookId) {
   const bookTarget = findBookId(bookId);
   if (bookTarget === null) return alert("books not found");
 
-  bookTarget.completed = false;
+  bookTarget.isComplete = false;
   localStorage.setItem(localStorageKey, JSON.stringify(books));
 
   document.dispatchEvent(new Event(RENDER_EVENT));
@@ -199,4 +199,3 @@ function findBookIndex(bookId) {
   }
   return -1;
 }
-
